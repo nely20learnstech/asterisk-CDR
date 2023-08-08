@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDR Data</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- <script type="text/javascript" src="jquery-3.6.1.js" defer></script> -->
+    <script type="text/javascript" src="jquery-3.6.1.min.js" defer></script>
+    <!-- <script src="assets/show-table.js" defer></script> -->
+    
+</head>
+<body>
+    <h1 class="header">Page d'Administration</h1>
+    <!-- Add the search input field -->
+    <!-- <input type="text" id="searchInput" placeholder="Search"> -->
+      <main class="table">
+        <section class="table__header">
+          <h1>Journal d'Appel - Call Detail Records (CDR)</h1>
+        </section>
+        <section class="table__body">
+          <table>
+            <thead>
+              <tr>
+                <th>Date et Heure d'appel</th>
+                <th>ID de l'émetteur </th>
+                <th>Source</th>
+                <th>Destination</th>
+                <th>dcontext</th>
+                <th>Channel</th>
+                <th>dstchannel</th>
+                <th>Last App</th>
+                <th>Last Data</th>
+                <th>Durée</th>
+                <th>Billsec</th>
+                <!-- <th>dispostion</th> -->
+                <th>Amaflags</th>
+                <!-- <th>accountcode</th>
+                <th>uniqueid</th>
+                <th>userfield</th> -->
+                <!-- Add more table headers for other fields if needed -->
+              </tr>
+            </thead>
+            <tbody id="cdrTableBody">
+              <!-- CDR data will be dynamically inserted here -->
+            </tbody>
+          </table>
+        </section>
+        
+      </main>
+
+      <script>
+
+        // Function to fetch CDR data and update the table
+        // function fetchCDRData() {
+        //   $.get('/cdr', function (data) {
+        //     const cdrTableBody = $('#cdrTableBody');
+        //     cdrTableBody.empty();
+    
+        //     data.forEach(function (cdr) {
+        //       // Format the call date to French format (e.g., 25/07/2023 16:19)
+        //       const formattedDate = new Date(cdr.calldate).toLocaleString('fr-FR');
+    
+        //       const row = `
+        //         <tr>
+        //           <td>${formattedDate}</td>
+        //           <td>${cdr.clid}</td>
+        //           <!-- Add more table cells for other fields if needed -->
+        //         </tr>
+        //       `;
+        //       cdrTableBody.append(row);
+        //     });
+        //   });
+        // }
+
+        function fetchCDRData() {
+      fetch('/cdr')
+        .then((response) => response.json())
+        .then((data) => {
+          const cdrTableBody = document.getElementById('cdrTableBody');
+          cdrTableBody.innerHTML = '';
+
+          data.forEach((cdr) => {
+
+            // // Format the call date to French format (e.g., 25/07/2023 16:19)
+            const formattedDate = new Date(cdr.calldate).toLocaleString('fr-FR');
+
+
+            const row = `
+              <tr>
+                <td>${formattedDate}</td>
+                <td>${cdr.clid}</td>
+                <td>${cdr.src }</td>
+                <td>${cdr.dst }</td>
+                <td>${cdr.dcontext }</td>
+                <td>${cdr.channel }</td>
+                <td>${cdr.dstchannel }</td>
+                <td>${cdr.lastapp }</td>
+                <td>${cdr.lastdata }</td>
+                <td>${cdr.duration }</td>
+                <td>${cdr.billsec }</td>
+                <td>${cdr.amaflags }</td>
+                
+                <!-- Add more table cells for other fields if needed -->
+              </tr>
+            `;
+            cdrTableBody.innerHTML += row;
+          });
+        })
+        .catch((error) => console.error('Error fetching CDR data:', error));
+    }
+    
+       
+
+      //   function filterTable() {
+      // const input = document.getElementById('searchInput');
+      // const filter = input.value.toLowerCase();
+      // const tableRows = document.querySelectorAll('#cdrTableBody tr');
+
+      // tableRows.forEach((row) => {
+      //   let matchFound = false;
+      //   row.querySelectorAll('td').forEach((cell) => {
+      //     const cellValue = cell.textContent.toLowerCase();
+      //     if (cellValue.includes(filter)) {
+      //       matchFound = true;
+      //     }
+      //   });
+
+      //   if (matchFound) {
+      //     row.style.display = 'table-row';
+      //   } else {
+      //     row.style.display = 'none';
+      //   }
+      // });
+
+      function filterTable() {
+      const input = document.getElementById('searchInput');
+      const filter = input.value.toLowerCase();
+      const tableRows = document.querySelectorAll('#cdrTableBody tr');
+
+      tableRows.forEach((row) => {
+        const rowVisible = Array.from(row.querySelectorAll('td')).some((cell) => {
+          const cellValue = cell.textContent.toLowerCase();
+          return cellValue.includes(filter);
+        });
+
+        if (rowVisible) {
+          row.style.display = 'table-row';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // Event listener for the search input field
+    // const searchInput = document.getElementById('searchInput');
+    // searchInput.addEventListener('input', filterTable);
+
+
+
+
+     // Fetch CDR data initially when the page loads
+     fetchCDRData();
+    
+    // Fetch CDR data every 1 millisecond (you can adjust the interval as needed)
+    setInterval(fetchCDRData, 2000);
+      </script>
+</body>
+</html>

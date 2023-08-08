@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1 class="header">Login</h1>
+  <form action="/login" method="post">
+   <div class="login_content">
+    <label for="username">Nom de l'utilisasteur :</label>
+    <input type="text" id="username" name="username" required>
+    <label for="password">Mot de passe :</label>
+    <input type="password" id="password" name="password" required>
+    <button type="submit" id="submit_button">Se connecter</button>
+   </div>
+  </form>
+  <p id="errorText" style="color: red; display: none;">Invalid username or password</p>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const errorText = document.getElementById('errorText');
+
+    loginForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(loginForm);
+      const username = formData.get('username');
+      const password = formData.get('password');
+
+      // Send login request to the server
+      fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      })
+      .then(response => {
+        if (response.redirected) {
+          window.location.href = response.url; // Redirect to app.js if login is successful
+        } else {
+          errorText.style.display = 'block'; // Show error message if login fails
+        }
+      })
+      .catch(error => {
+        console.error('Error during login:', error);
+        errorText.style.display = 'block'; // Show error message if there's an error
+      });
+    });
+  </script>
+
+
+</body>
+</html>
+
